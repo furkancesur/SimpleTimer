@@ -3,6 +3,9 @@ import SwiftUI
 struct ContentView: View {
     @State private var timeRemaining = 60
     @State private var isActive = false
+    
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
 
     var body: some View {
         VStack {
@@ -33,6 +36,14 @@ struct ContentView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
+            }
+        }
+        .onReceive(timer) { _ in
+            guard self.isActive else { return }
+            if self.timeRemaining > 0 {
+                self.timeRemaining -= 1
+            } else {
+                self.isActive = false
             }
         }
     }
