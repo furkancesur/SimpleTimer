@@ -1,24 +1,51 @@
-//
-//  ContentView.swift
-//  SimpleTimer
-//
-//  Created by Furkan Cesur on 8/26/24.
-//
-
 import SwiftUI
 
 struct ContentView: View {
+    @State private var timeRemaining = 60
+    @State private var isActive = false
+
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            Text(timeString(time: timeRemaining))
+                .font(.system(size: 80, weight: .bold, design: .rounded))
+                .padding()
+            
+            HStack {
+                Button(action: {
+                    self.isActive.toggle()
+                }) {
+                    Text(isActive ? "Pause" : "Start")
+                        .font(.title)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+                
+                Button(action: {
+                    self.timeRemaining = 60
+                    self.isActive = false
+                }) {
+                    Text("Reset")
+                        .font(.title)
+                        .padding()
+                        .background(Color.red)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+            }
         }
-        .padding()
+    }
+    
+    func timeString(time: Int) -> String {
+        let minutes = time / 60
+        let seconds = time % 60
+        return String(format: "%02d:%02d", minutes, seconds)
     }
 }
 
-#Preview {
-    ContentView()
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
 }
