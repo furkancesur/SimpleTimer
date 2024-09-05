@@ -1,4 +1,5 @@
 import SwiftUI
+import AVFoundation
 
 struct ContentView: View {
     @State private var hours = 0
@@ -8,7 +9,7 @@ struct ContentView: View {
     @State private var timeRemaining: Int = 0
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-
+    
     var body: some View {
         NavigationView {
             VStack {
@@ -71,7 +72,7 @@ struct ContentView: View {
                     }
                 }
             }
-            .navigationTitle("Simple Timer")
+            .navigationTitle("Timers")
         }
         .onReceive(timer) { _ in
             guard isActive else { return }
@@ -79,6 +80,7 @@ struct ContentView: View {
                 timeRemaining -= 1
             } else {
                 isActive = false
+                playSound()
             }
         }
     }
@@ -88,6 +90,10 @@ struct ContentView: View {
         let minutes = (time % 3600) / 60
         let seconds = time % 60
         return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+    }
+    
+    func playSound() {
+        AudioServicesPlaySystemSound(1005) // This is the system sound for "Tink"
     }
 }
 
