@@ -1,57 +1,93 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var timeRemaining = 60
+    @State private var hours = 0
+    @State private var minutes = 0
+    @State private var seconds = 0
     @State private var isActive = false
+    @State private var timeRemaining: Int = 0
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-
     var body: some View {
-        VStack {
-            Text(timeString(time: timeRemaining))
-                .font(.system(size: 80, weight: .bold, design: .rounded))
-                .padding()
-            
-            HStack {
-                Button(action: {
-                    self.isActive.toggle()
-                }) {
-                    Text(isActive ? "Pause" : "Start")
-                        .font(.title)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
+        NavigationView {
+            VStack {
+                Text(timeString(time: timeRemaining))
+                    .font(.system(size: 80, weight: .bold, design: .rounded))
+                    .padding()
                 
-                Button(action: {
-                    self.timeRemaining = 60
-                    self.isActive = false
-                }) {
-                    Text("Reset")
-                        .font(.title)
-                        .padding()
-                        .background(Color.red)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+                HStack {
+                    Picker("Hours", selection: $hours) {
+                        ForEach(0..<24) { hour in
+                            Text("\(hour) hour\(hour == 1 ? "" : "s")")
+                        }
+                    }
+                    .pickerStyle(WheelPickerStyle())
+                    
+                    Picker("Minutes", selection: $minutes) {
+                        ForEach(0..<60) { minute in
+                            Text("\(minute) min")
+                        }
+                    }
+                    .pickerStyle(WheelPickerStyle())
+                    
+                    Picker("Seconds", selection: $seconds) {
+                        ForEach(0..<60) { second in
+                            Text("\(second) sec")
+                        }
+                    }
+                    .pickerStyle(WheelPickerStyle())
+                }
+                .padding()
+                
+                HStack {
+                    Button(action: {
+                        if !isActive {
+                            timeRemaining = hours * 3600 + minutes * 60 + seconds
+                        }
+                        isActive.toggle()
+                    }) {
+                        Text(isActive ? "Pause" : "Start")
+                            .font(.title)
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                    
+                    Button(action: {
+                        hours = 0
+                        minutes = 0
+                        seconds = 0
+                        timeRemaining = 0
+                        isActive = false
+                    }) {
+                        Text("Reset")
+                            .font(.title)
+                            .padding()
+                            .background(Color.red)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
                 }
             }
+            .navigationTitle("Simple Timer")
         }
         .onReceive(timer) { _ in
-            guard self.isActive else { return }
-            if self.timeRemaining > 0 {
-                self.timeRemaining -= 1
+            guard isActive else { return }
+            if timeRemaining > 0 {
+                timeRemaining -= 1
             } else {
-                self.isActive = false
+                isActive = false
             }
         }
     }
     
     func timeString(time: Int) -> String {
-        let minutes = time / 60
+        let hours = time / 3600
+        let minutes = (time % 3600) / 60
         let seconds = time % 60
-        return String(format: "%02d:%02d", minutes, seconds)
+        return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
     }
 }
 
